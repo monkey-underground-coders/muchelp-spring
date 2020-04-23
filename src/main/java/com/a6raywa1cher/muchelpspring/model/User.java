@@ -10,7 +10,14 @@ import java.util.List;
 @Data
 public class User {
     @Id
-    private String id;
+    @GeneratedValue
+    private Long id;
+
+    @Column(unique = true, length = 1024)
+    private String googleId;
+
+    @Column(unique = true, length = 1024)
+    private String vkId;
 
     @Column(unique = true, nullable = false, length = 1024)
     private String email;

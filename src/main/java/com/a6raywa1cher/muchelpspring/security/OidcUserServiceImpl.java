@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-@Component
+@Component("oidc-user-service")
 public class OidcUserServiceImpl implements OAuth2UserService<OidcUserRequest, OidcUser> {
 	private final UserRepository userRepository;
 	private OidcUserService oidcUserService = new OidcUserService();
@@ -30,18 +30,20 @@ public class OidcUserServiceImpl implements OAuth2UserService<OidcUserRequest, O
 		if (!oidcUser.getEmailVerified()) {
 			throw new OAuth2AuthenticationException(new OAuth2Error("Unverified email"));
 		}
-		String id = oidcUser.getSubject();
-		User user = userRepository.findById(id).orElseGet(() -> {
+		String googleId = oidcUser.getSubject();
+		String email = oidcUser.getEmail();
+		User user = userRepository.findByGoogleIdOrEmail(googleId, email).orElseGet(() -> {
 			User user1 = new User();
-			user1.setId(id);
+			user1.setGoogleId(googleId);
 			user1.setCreatedAt(LocalDateTime.now());
-			user1.setEmail(oidcUser.getEmail());
+			user1.setEmail(email);
 			user1.setLastTicket(null);
 			user1.setMySubjects(new ArrayList<>());
 			user1.setName(oidcUser.getFullName());
 			user1.setPicture(oidcUser.getPicture());
 			return user1;
 		});
+		user.setGoogleId(googleId);
 		user.setLastVisit(LocalDateTime.now());
 		return new DefaultOidcUser(userRepository.save(user), oidcUser);
 	}
