@@ -16,4 +16,10 @@ public class AuthController {
 	public Map<String, Object> user(@AuthenticationPrincipal User principal) {
 		return Collections.singletonMap("name", principal.getName());
 	}
+
+//	@GetMapping("/log_redirect")
+//	public ResponseEntity<?> logRedirect(HttpServletRequest request) {
+//		HttpSession session = request.getSession();
+//		if ()
+//	}
 }

@@ -8,6 +8,7 @@ import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
@@ -44,9 +45,31 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Qualifier("oauth2-user-service")
 	private OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService;
 
+	@Autowired
+	private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+
+	@Autowired
+	@Qualifier("user-details-service-impl")
+	private UserDetailsService userDetailsService;
+
+	@Override
+	protected UserDetailsService userDetailsService() {
+		return userDetailsService;
+	}
+
+	@Bean
+	public RestTemplate restTemplate() {
+		return new RestTemplate();
+	}
+
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		SimpleUrlAuthenticationFailureHandler handler = new SimpleUrlAuthenticationFailureHandler("/");
+
+		http.sessionManagement()
+				.sessionFixation()
+				.migrateSession();
+
 		http
 				.csrf().disable()
 //				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -65,21 +88,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/auth/**").authenticated()
 				.anyRequest().permitAll();
 		http.oauth2Login()
+//				.successHandler(customAuthenticationSuccessHandler)
 				.userInfoEndpoint()
 				.oidcUserService(oidcUserService)
 				.userService(oAuth2UserService)
 				.and()
-				.redirectionEndpoint()
-				.and()
-				.failureHandler((request, response, exception) -> {
-					request.getSession().setAttribute("error.message", exception.getMessage());
-					handler.onAuthenticationFailure(request, response, exception);
-				})
+//				.redirectionEndpoint()
+//				.and()
+//				.failureHandler((request, response, exception) -> {
+//					request.getSession().setAttribute("error.message", exception.getMessage());
+//					handler.onAuthenticationFailure(request, response, exception);
+//				})
 				.tokenEndpoint()
 				.accessTokenResponseClient(accessTokenResponseClient());
-
+		http.logout()
+				.logoutUrl("/logout")
+				.logoutSuccessUrl("/");
 		http.oauth2Client();
-
 		http.cors()
 				.configurationSource(corsConfigurationSource());
 	}
@@ -95,7 +120,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		tokenResponseHttpMessageConverter.setTokenResponseConverter(map -> {
 			String accessToken = map.get(OAuth2ParameterNames.ACCESS_TOKEN);
 			long expiresIn = Long.parseLong(map.get(OAuth2ParameterNames.EXPIRES_IN));
-
 
 			OAuth2AccessToken.TokenType accessTokenType = OAuth2AccessToken.TokenType.BEARER;
 

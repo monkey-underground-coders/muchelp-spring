@@ -10,7 +10,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import java.util.Collection;
 import java.util.Map;
 
-public class DefaultOidcUser extends User implements OidcUser {
+public class DefaultOidcUser extends User implements OidcUser, OAuthUserInfo {
 	private OidcUser oidcUser;
 
 	public DefaultOidcUser(User user, OidcUser oidcUser) {
@@ -46,5 +46,20 @@ public class DefaultOidcUser extends User implements OidcUser {
 	@Override
 	public OidcIdToken getIdToken() {
 		return oidcUser.getIdToken();
+	}
+
+	@Override
+	public String getVendor() {
+		return "google";
+	}
+
+	@Override
+	public String getVendorId() {
+		return this.getAttribute("sub");
+	}
+
+	@Override
+	public String toString() {
+		return this.getEmail();
 	}
 }

@@ -8,13 +8,16 @@ import java.util.List;
 @Entity
 @Data
 public class Subject {
-    @Id
-    @GeneratedValue
-    private Long id;
+	@Id
+	@GeneratedValue
+	private Long id;
 
-    @Column(unique = true)
-    private String name;
+	@Column(unique = true)
+	private String name;
 
-    @ManyToMany
-    private List<User> userList;
+	@ManyToMany
+	private List<User> userList;
+
+	@OneToMany(mappedBy = "subject")
+	private List<Ticket> tickets;
 }

@@ -8,7 +8,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import java.util.Collection;
 import java.util.Map;
 
-public class DefaultOAuth2User extends User implements OAuth2User {
+public class DefaultOAuth2User extends User implements OAuth2User, OAuthUserInfo {
 	private final Map<String, Object> attributes;
 	private final Collection<? extends GrantedAuthority> authorities;
 
@@ -26,5 +26,20 @@ public class DefaultOAuth2User extends User implements OAuth2User {
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return authorities;
+	}
+
+	@Override
+	public String getVendor() {
+		return "vk";
+	}
+
+	@Override
+	public String getVendorId() {
+		return this.getAttribute("user_id");
+	}
+
+	@Override
+	public String toString() {
+		return this.getEmail();
 	}
 }
