@@ -86,6 +86,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //				.antMatchers("/poll").permitAll()
 //				.anyRequest().authenticated()
 				.antMatchers("/auth/**").authenticated()
+				.antMatchers("/user/current").authenticated()
 				.anyRequest().permitAll();
 		http.oauth2Login()
 //				.successHandler(customAuthenticationSuccessHandler)

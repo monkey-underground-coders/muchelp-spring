@@ -1,25 +1,29 @@
 package com.a6raywa1cher.muchelpspring.rest;
 
 import com.a6raywa1cher.muchelpspring.model.User;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.a6raywa1cher.muchelpspring.utils.AuthenticationResolver;
+import com.a6raywa1cher.muchelpspring.utils.Views;
+import com.fasterxml.jackson.annotation.JsonView;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collections;
-import java.util.Map;
-
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-	@GetMapping("/user")
-	public Map<String, Object> user(@AuthenticationPrincipal User principal) {
-		return Collections.singletonMap("name", principal.getName());
+	private final AuthenticationResolver authenticationResolver;
+
+	public AuthController(AuthenticationResolver authenticationResolver) {
+		this.authenticationResolver = authenticationResolver;
 	}
 
-//	@GetMapping("/log_redirect")
-//	public ResponseEntity<?> logRedirect(HttpServletRequest request) {
-//		HttpSession session = request.getSession();
-//		if ()
-//	}
+	@GetMapping("/user")
+	@JsonView(Views.Internal.class)
+	public ResponseEntity<User> getCurrentUser() {
+		User user = authenticationResolver.getUser();
+		if (user == null) return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		return ResponseEntity.ok(user);
+	}
 }

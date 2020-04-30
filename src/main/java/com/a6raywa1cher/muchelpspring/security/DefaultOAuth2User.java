@@ -1,21 +1,20 @@
 package com.a6raywa1cher.muchelpspring.security;
 
 import com.a6raywa1cher.muchelpspring.model.User;
-import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
 import java.util.Map;
 
-public class DefaultOAuth2User extends User implements OAuth2User, OAuthUserInfo {
+public class DefaultOAuth2User implements OAuthUserInfo {
 	private final Map<String, Object> attributes;
 	private final Collection<? extends GrantedAuthority> authorities;
+	private final User user;
 
 	public DefaultOAuth2User(User user, Map<String, Object> attributes, Collection<? extends GrantedAuthority> authorities) {
 		this.attributes = attributes;
 		this.authorities = authorities;
-		BeanUtils.copyProperties(user, this);
+		this.user = user;
 	}
 
 	@Override
@@ -40,6 +39,16 @@ public class DefaultOAuth2User extends User implements OAuth2User, OAuthUserInfo
 
 	@Override
 	public String toString() {
-		return this.getEmail();
+		return user.getEmail();
+	}
+
+	@Override
+	public Long getId() {
+		return user.getId();
+	}
+
+	@Override
+	public String getName() {
+		return user.getEmail();
 	}
 }

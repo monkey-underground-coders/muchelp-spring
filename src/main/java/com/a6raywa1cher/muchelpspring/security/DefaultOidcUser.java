@@ -1,7 +1,6 @@
 package com.a6raywa1cher.muchelpspring.security;
 
 import com.a6raywa1cher.muchelpspring.model.User;
-import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
@@ -10,12 +9,13 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import java.util.Collection;
 import java.util.Map;
 
-public class DefaultOidcUser extends User implements OidcUser, OAuthUserInfo {
+public class DefaultOidcUser implements OidcUser, OAuthUserInfo {
 	private OidcUser oidcUser;
+	private final User user;
 
 	public DefaultOidcUser(User user, OidcUser oidcUser) {
 		this.oidcUser = oidcUser;
-		BeanUtils.copyProperties(user, this);
+		this.user = user;
 	}
 
 	@Override
@@ -54,12 +54,22 @@ public class DefaultOidcUser extends User implements OidcUser, OAuthUserInfo {
 	}
 
 	@Override
+	public Long getId() {
+		return user.getId();
+	}
+
+	@Override
 	public String getVendorId() {
 		return this.getAttribute("sub");
 	}
 
 	@Override
 	public String toString() {
+		return this.getEmail();
+	}
+
+	@Override
+	public String getName() {
 		return this.getEmail();
 	}
 }
