@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -87,6 +88,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //				.anyRequest().authenticated()
 				.antMatchers("/auth/**").authenticated()
 				.antMatchers("/user/current").authenticated()
+				.antMatchers("/subject/**").authenticated()
+				.antMatchers(HttpMethod.GET, "/subject/**").permitAll()
 				.anyRequest().permitAll();
 		http.oauth2Login()
 //				.successHandler(customAuthenticationSuccessHandler)
