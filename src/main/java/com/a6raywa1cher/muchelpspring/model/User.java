@@ -1,10 +1,7 @@
 package com.a6raywa1cher.muchelpspring.model;
 
 import com.a6raywa1cher.muchelpspring.utils.Views;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonView;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
 import lombok.ToString;
 
@@ -43,10 +40,12 @@ public class User {
 
     @ManyToMany(mappedBy = "userList")
     @JsonView(Views.Public.class)
+    @JsonIgnoreProperties({"userList", "tickets"})
     private List<Subject> mySubjects;
 
     @OneToOne
     @JsonView(Views.Public.class)
+    @JsonIdentityReference(alwaysAsId = true)
     private Ticket lastTicket;
 
     @ElementCollection
