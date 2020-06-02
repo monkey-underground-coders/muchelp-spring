@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -81,7 +81,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 			JwtToken jwtToken = JwtToken.builder()
 					.token(token)
 					.uid(Long.parseLong(decodedJWT.getSubject()))
-					.expiringAt(LocalDateTime.from(decodedJWT.getExpiresAt().toInstant()))
+					.expiringAt(decodedJWT.getExpiresAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
 					.build();
 			if (!decodedJWT.getClaim(VENDOR_SUB_CLAIM).isNull()) {
 				jwtToken.setVendorId(VendorId.valueOf(decodedJWT.getClaim(VENDOR_ID_CLAIM).asString()));

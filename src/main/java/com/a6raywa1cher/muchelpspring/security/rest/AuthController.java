@@ -11,12 +11,13 @@ import com.a6raywa1cher.muchelpspring.security.rest.res.GetNewJwtTokenResponse;
 import com.a6raywa1cher.muchelpspring.utils.AuthenticationResolver;
 import com.a6raywa1cher.muchelpspring.utils.Views;
 import com.fasterxml.jackson.annotation.JsonView;
-import org.springframework.http.HttpStatus;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +25,7 @@ import javax.validation.Valid;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 
-@Controller
+@RestController
 @RequestMapping("/auth")
 public class AuthController {
 	private final RefreshTokenService refreshTokenService;
@@ -42,13 +43,13 @@ public class AuthController {
 
 	@GetMapping("/user")
 	@JsonView(Views.Internal.class)
-	public ResponseEntity<User> getCurrentUser() {
-		User user = authenticationResolver.getUser();
-		if (user == null) return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	@Operation(security = @SecurityRequirement(name = "jwt"))
+	public ResponseEntity<User> getCurrentUser(@Parameter(hidden = true) User user) {
 		return ResponseEntity.ok(user);
 	}
 
 	@GetMapping("/convert")
+	@Operation(security = @SecurityRequirement(name = "jwt"))
 	public ResponseEntity<GetNewJwtTokenResponse> convertToJwt(HttpServletRequest request, Authentication authentication) {
 		if (!(authentication instanceof OAuth2AuthenticationToken)) {
 			return ResponseEntity.badRequest().build();
@@ -85,6 +86,7 @@ public class AuthController {
 	}
 
 	@DeleteMapping("/invalidate")
+	@Operation(security = @SecurityRequirement(name = "jwt"))
 	public ResponseEntity<Void> invalidateToken(@RequestBody @Valid InvalidateTokenRequest request) {
 		User user = authenticationResolver.getUser();
 		Optional<RefreshToken> optional = refreshTokenService.getByToken(request.getRefreshToken());
@@ -98,6 +100,7 @@ public class AuthController {
 	}
 
 	@DeleteMapping("/invalidate_all")
+	@Operation(security = @SecurityRequirement(name = "jwt"))
 	public ResponseEntity<Void> invalidateAllTokens() {
 		User user = authenticationResolver.getUser();
 		refreshTokenService.invalidateAll(user);

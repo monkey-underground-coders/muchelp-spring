@@ -28,6 +28,6 @@ public class AuthenticationResolverImpl implements AuthenticationResolver {
 			String email = token.getPrincipal().getAttribute("email");
 			return userService.getByVendorIdOrEmail(vendorId, id, email).orElseThrow();
 		}
-		throw new RuntimeException("Unknown Authentication " + authentication.getClass().getCanonicalName());
+		throw new AuthenticationResolveException("Unknown Authentication " + authentication.getClass().getCanonicalName());
 	}
 }

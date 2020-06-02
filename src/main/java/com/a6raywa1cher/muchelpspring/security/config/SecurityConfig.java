@@ -1,8 +1,11 @@
 package com.a6raywa1cher.muchelpspring.security.config;
 
 import com.a6raywa1cher.muchelpspring.security.CustomAuthenticationSuccessHandler;
+import com.a6raywa1cher.muchelpspring.security.LastVisitFilter;
 import com.a6raywa1cher.muchelpspring.security.jwt.JWTAuthorizationFilter;
 import com.a6raywa1cher.muchelpspring.security.jwt.service.JwtTokenService;
+import com.a6raywa1cher.muchelpspring.service.UserService;
+import com.a6raywa1cher.muchelpspring.utils.AuthenticationResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +31,7 @@ import org.springframework.security.oauth2.core.http.converter.OAuth2AccessToken
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -52,17 +56,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
 
-//	@Autowired
-//	@Qualifier("user-details-service-impl")
-//	private UserDetailsService userDetailsService;
-
 	@Autowired
 	private JwtTokenService jwtTokenService;
-//
-//	@Override
-//	protected UserDetailsService userDetailsService() {
-//		return userDetailsService;
-//	}
+
+	@Autowired
+	private UserService userService;
+
+	@Autowired
+	private AuthenticationResolver resolver;
 
 	@Bean
 	public RestTemplate restTemplate() {
@@ -113,6 +114,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.cors()
 				.configurationSource(corsConfigurationSource());
 		http.addFilterBefore(new JWTAuthorizationFilter(jwtTokenService), OAuth2AuthorizationCodeGrantFilter.class);
+		http.addFilterAfter(new LastVisitFilter(userService, resolver), SecurityContextHolderAwareRequestFilter.class);
 	}
 
 	@Bean

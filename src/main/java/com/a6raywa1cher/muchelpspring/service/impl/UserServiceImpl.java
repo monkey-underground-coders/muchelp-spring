@@ -5,7 +5,9 @@ import com.a6raywa1cher.muchelpspring.model.VendorId;
 import com.a6raywa1cher.muchelpspring.model.repo.UserRepository;
 import com.a6raywa1cher.muchelpspring.service.UserService;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 @Component
@@ -31,5 +33,12 @@ public class UserServiceImpl implements UserService {
 			default:
 				throw new RuntimeException();
 		}
+	}
+
+	@Override
+	@Transactional
+	public User setLastVisit(User user, ZonedDateTime now) {
+		user.setLastVisit(now);
+		return repository.save(user);
 	}
 }

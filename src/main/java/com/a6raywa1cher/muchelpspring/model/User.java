@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -62,10 +62,10 @@ public class User {
     @Column
     @JsonView(Views.Public.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private LocalDateTime createdAt;
+    private ZonedDateTime createdAt;
 
     @Column
     @JsonView(Views.Public.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private LocalDateTime lastVisit;
+    private ZonedDateTime lastVisit;
 }

@@ -1,4 +1,6 @@
 #app:
+app:
+  version: '@project.version@'
 spring:
   servlet:
     multipart:
