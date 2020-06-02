@@ -1,5 +1,8 @@
-package com.a6raywa1cher.muchelpspring.security;
+package com.a6raywa1cher.muchelpspring.security.config;
 
+import com.a6raywa1cher.muchelpspring.security.CustomAuthenticationSuccessHandler;
+import com.a6raywa1cher.muchelpspring.security.jwt.JWTAuthorizationFilter;
+import com.a6raywa1cher.muchelpspring.security.jwt.service.JwtTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -9,7 +12,6 @@ import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
@@ -18,6 +20,7 @@ import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorH
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationCodeGrantFilter;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
@@ -49,14 +52,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
 
-	@Autowired
-	@Qualifier("user-details-service-impl")
-	private UserDetailsService userDetailsService;
+//	@Autowired
+//	@Qualifier("user-details-service-impl")
+//	private UserDetailsService userDetailsService;
 
-	@Override
-	protected UserDetailsService userDetailsService() {
-		return userDetailsService;
-	}
+	@Autowired
+	private JwtTokenService jwtTokenService;
+//
+//	@Override
+//	protected UserDetailsService userDetailsService() {
+//		return userDetailsService;
+//	}
 
 	@Bean
 	public RestTemplate restTemplate() {
@@ -81,28 +87,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.authorizeRequests()
 //				.antMatchers("/").permitAll()
 //				.antMatchers("/user/reg", "/oauth2/**", "/error").permitAll()
-//				.antMatchers("/v2/api-docs", "/webjars/**", "/swagger-resources", "/swagger-resources/**",
-//						"/swagger-ui.html").permitAll()
+				.antMatchers("/v2/api-docs", "/webjars/**", "/swagger-resources", "/swagger-resources/**",
+						"/swagger-ui.html").permitAll()
 //				.antMatchers("/csrf").permitAll()
 //				.antMatchers("/poll").permitAll()
 //				.anyRequest().authenticated()
+				.antMatchers("/auth/get_access").permitAll()
 				.antMatchers("/auth/**").authenticated()
 				.antMatchers("/user/current").authenticated()
 				.antMatchers("/subject/**").authenticated()
 				.antMatchers(HttpMethod.GET, "/subject/**").permitAll()
 				.anyRequest().permitAll();
 		http.oauth2Login()
-//				.successHandler(customAuthenticationSuccessHandler)
+				.successHandler(customAuthenticationSuccessHandler)
 				.userInfoEndpoint()
 				.oidcUserService(oidcUserService)
 				.userService(oAuth2UserService)
 				.and()
-//				.redirectionEndpoint()
-//				.and()
-//				.failureHandler((request, response, exception) -> {
-//					request.getSession().setAttribute("error.message", exception.getMessage());
-//					handler.onAuthenticationFailure(request, response, exception);
-//				})
 				.tokenEndpoint()
 				.accessTokenResponseClient(accessTokenResponseClient());
 		http.logout()
@@ -111,6 +112,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.oauth2Client();
 		http.cors()
 				.configurationSource(corsConfigurationSource());
+		http.addFilterBefore(new JWTAuthorizationFilter(jwtTokenService), OAuth2AuthorizationCodeGrantFilter.class);
 	}
 
 	@Bean

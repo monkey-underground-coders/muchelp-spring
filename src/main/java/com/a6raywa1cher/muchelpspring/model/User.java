@@ -3,6 +3,7 @@ package com.a6raywa1cher.muchelpspring.model;
 import com.a6raywa1cher.muchelpspring.utils.Views;
 import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.persistence.*;
@@ -12,7 +13,8 @@ import java.util.Map;
 
 @Entity
 @Data
-@ToString(exclude = {"mySubjects", "lastTicket"})
+@EqualsAndHashCode(exclude = {"mySubjects", "lastTicket", "statistics"})
+@ToString(exclude = {"mySubjects", "lastTicket", "statistics"})
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id")
