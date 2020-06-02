@@ -13,9 +13,13 @@ import com.a6raywa1cher.muchelpspring.utils.Views;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.OffsetDateTime;
 import java.util.Optional;
@@ -42,6 +46,24 @@ public class AuthController {
 		User user = authenticationResolver.getUser();
 		if (user == null) return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		return ResponseEntity.ok(user);
+	}
+
+	@GetMapping("/convert")
+	public ResponseEntity<GetNewJwtTokenResponse> convertToJwt(HttpServletRequest request, Authentication authentication) {
+		if (!(authentication instanceof OAuth2AuthenticationToken)) {
+			return ResponseEntity.badRequest().build();
+		}
+		User user = authenticationResolver.getUser();
+		JwtToken accessToken = jwtTokenService.issue(user.getId());
+		RefreshToken refreshToken = refreshTokenService.issue(user);
+		SecurityContextHolder.clearContext();
+		request.getSession().invalidate();
+		return ResponseEntity.ok(new GetNewJwtTokenResponse(
+				refreshToken.getToken(),
+				OffsetDateTime.of(refreshToken.getExpiringAt(), OffsetDateTime.now().getOffset()),
+				accessToken.getToken(),
+				OffsetDateTime.of(accessToken.getExpiringAt(), OffsetDateTime.now().getOffset())
+		));
 	}
 
 	@PostMapping("/get_access")

@@ -3,14 +3,11 @@ package com.a6raywa1cher.muchelpspring.security;
 import com.a6raywa1cher.muchelpspring.model.User;
 import com.a6raywa1cher.muchelpspring.model.VendorId;
 import com.a6raywa1cher.muchelpspring.model.repo.UserRepository;
-import com.a6raywa1cher.muchelpspring.security.jwt.JwtToken;
 import com.a6raywa1cher.muchelpspring.security.jwt.service.JwtTokenService;
 import com.a6raywa1cher.muchelpspring.security.jwt.service.RefreshTokenService;
-import com.a6raywa1cher.muchelpspring.security.model.RefreshToken;
 import com.a6raywa1cher.muchelpspring.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
@@ -86,23 +83,20 @@ public class CustomAuthenticationSuccessHandler extends SavedRequestAwareAuthent
 	@Override
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
-		Authentication newAuthentication = authentication;
 		if (authentication instanceof OAuth2AuthenticationToken) { // exchange OAuth information to JWT + refresh pair
 			OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
-			OAuth2User oAuth2User = token.getPrincipal();
-			User user = getUserOrRegister(token);
-			JwtToken jwt = jwtTokenService.issue(getVendorId(token), oAuth2User.getAttribute("sub"), user.getId());
-			CustomAuthentication customAuthentication = new CustomAuthentication(
-					authentication.getAuthorities(), jwt
-			);
-			SecurityContextHolder.getContext().setAuthentication(customAuthentication);
-			newAuthentication = customAuthentication;
-			response.setHeader("MHS-JWTToken", jwt.getToken());
-
-			RefreshToken refreshToken = refreshTokenService.issue(user);
-			response.setHeader("MHS-RefreshToken", refreshToken.getToken());
+			getUserOrRegister(token);
+//			JwtToken jwt = jwtTokenService.issue(getVendorId(token), oAuth2User.getAttribute("sub"), user.getId());
+//			CustomAuthentication customAuthentication = new CustomAuthentication(
+//					authentication.getAuthorities(), jwt
+//			);
+//			SecurityContextHolder.getContext().setAuthentication(customAuthentication);
+//			newAuthentication = customAuthentication;
+//			response.setHeader("MHS-JWTToken", jwt.getToken());
+//
+//			RefreshToken refreshToken = refreshTokenService.issue(user);
+//			response.setHeader("MHS-RefreshToken", refreshToken.getToken());
 		}
-		super.onAuthenticationSuccess(request, response, newAuthentication);
-		request.getSession().invalidate();
+		super.onAuthenticationSuccess(request, response, authentication);
 	}
 }
