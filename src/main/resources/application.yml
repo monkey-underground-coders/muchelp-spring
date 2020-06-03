@@ -1,6 +1,9 @@
 #app:
 app:
   version: '@project.version@'
+jwt:
+  secret: fill-me-later
+  exchange-duration: PT15M
 spring:
   servlet:
     multipart:

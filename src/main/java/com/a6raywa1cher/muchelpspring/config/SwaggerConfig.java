@@ -20,7 +20,7 @@ public class SwaggerConfig {
 		return new OpenAPI()
 				.info(
 						new Info().title("muchelp-spring")
-								.description("Spring shop sample application")
+								.description("Website for helping")
 								.version(version)
 								.license(new License().name("MIT License")
 										.url("https://github.com/monkey-underground-coders/mucpoll-spring/blob/master/LICENSE")
@@ -28,9 +28,7 @@ public class SwaggerConfig {
 				)
 				.components(
 						new Components()
-								.addSecuritySchemes("jwt", new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer")
-//										.bearerFormat("JWT")
-								)
+								.addSecuritySchemes("jwt", new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer"))
 				);
 	}
 

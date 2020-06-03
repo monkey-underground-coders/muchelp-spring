@@ -8,7 +8,6 @@ import com.a6raywa1cher.muchelpspring.utils.AuthenticationResolver;
 import com.a6raywa1cher.muchelpspring.utils.Views;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -16,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Controller
+@RestController
 @RequestMapping("/subject")
 public class SubjectController {
 	private final SubjectService subjectService;

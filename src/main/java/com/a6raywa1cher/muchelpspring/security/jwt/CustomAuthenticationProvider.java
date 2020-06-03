@@ -1,9 +1,7 @@
 package com.a6raywa1cher.muchelpspring.security.jwt;
 
 import com.a6raywa1cher.muchelpspring.security.CustomAuthentication;
-import com.a6raywa1cher.muchelpspring.security.jwt.service.JwtTokenService;
 import com.a6raywa1cher.muchelpspring.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -13,10 +11,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CustomAuthenticationProvider implements AuthenticationProvider {
-	@Autowired
-	JwtTokenService jwtTokenService;
-	@Autowired
-	UserService userService;
+	private final UserService userService;
+
+	public CustomAuthenticationProvider(UserService userService) {
+		this.userService = userService;
+	}
 
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {

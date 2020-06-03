@@ -3,10 +3,7 @@ package com.a6raywa1cher.muchelpspring.security;
 import com.a6raywa1cher.muchelpspring.model.User;
 import com.a6raywa1cher.muchelpspring.model.VendorId;
 import com.a6raywa1cher.muchelpspring.model.repo.UserRepository;
-import com.a6raywa1cher.muchelpspring.security.jwt.service.JwtTokenService;
-import com.a6raywa1cher.muchelpspring.security.jwt.service.RefreshTokenService;
 import com.a6raywa1cher.muchelpspring.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -24,14 +21,13 @@ import java.util.Optional;
 
 @Component
 public class CustomAuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
-	@Autowired
-	private UserService userService;
-	@Autowired
-	private UserRepository userRepository;
-	@Autowired
-	private JwtTokenService jwtTokenService;
-	@Autowired
-	private RefreshTokenService refreshTokenService;
+	private final UserService userService;
+	private final UserRepository userRepository;
+
+	public CustomAuthenticationSuccessHandler(UserService userService, UserRepository userRepository) {
+		this.userService = userService;
+		this.userRepository = userRepository;
+	}
 
 	private VendorId getVendorId(OAuth2AuthenticationToken authentication) {
 		return VendorId.valueOf(authentication.getAuthorizedClientRegistrationId().toUpperCase());
@@ -83,7 +79,7 @@ public class CustomAuthenticationSuccessHandler extends SavedRequestAwareAuthent
 	@Override
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
-		if (authentication instanceof OAuth2AuthenticationToken) { // exchange OAuth information to JWT + refresh pair
+		if (authentication instanceof OAuth2AuthenticationToken) { // register user
 			OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
 			getUserOrRegister(token);
 //			JwtToken jwt = jwtTokenService.issue(getVendorId(token), oAuth2User.getAttribute("sub"), user.getId());

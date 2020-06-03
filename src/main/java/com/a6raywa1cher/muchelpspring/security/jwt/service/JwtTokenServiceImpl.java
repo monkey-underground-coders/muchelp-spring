@@ -10,9 +10,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Optional;
 
@@ -26,7 +26,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 	private Algorithm algorithm;
 	private JWTVerifier jwtVerifier;
 	@Value("${jwt.exchange-duration}")
-	private long duration;
+	private Duration duration;
 
 	@PostConstruct
 	public void init() {
@@ -52,7 +52,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 	}
 
 	private ZonedDateTime nowPlusDuration() {
-		return ZonedDateTime.now().plus(duration, ChronoUnit.SECONDS);
+		return ZonedDateTime.now().plus(duration);
 	}
 
 	@Override

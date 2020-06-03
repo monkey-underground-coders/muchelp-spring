@@ -1,7 +1,6 @@
 package com.a6raywa1cher.muchelpspring.utils;
 
 import com.a6raywa1cher.muchelpspring.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,8 +11,11 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 @Component
 public class UserHandlerMethodArgumentResolver implements HandlerMethodArgumentResolver {
-	@Autowired
-	AuthenticationResolver resolver;
+	private final AuthenticationResolver resolver;
+
+	public UserHandlerMethodArgumentResolver(AuthenticationResolver resolver) {
+		this.resolver = resolver;
+	}
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {

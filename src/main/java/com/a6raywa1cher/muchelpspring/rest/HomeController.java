@@ -1,11 +1,11 @@
 package com.a6raywa1cher.muchelpspring.rest;
 
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 
-@Controller
+@RestController
 public class HomeController {
 	@GetMapping("/error")
 	public String error(HttpServletRequest request) {

@@ -3,7 +3,7 @@ package com.a6raywa1cher.muchelpspring.security.config;
 import com.a6raywa1cher.muchelpspring.security.CustomAuthenticationSuccessHandler;
 import com.a6raywa1cher.muchelpspring.security.LastVisitFilter;
 import com.a6raywa1cher.muchelpspring.security.jwt.CustomAuthenticationProvider;
-import com.a6raywa1cher.muchelpspring.security.jwt.JWTAuthorizationFilter;
+import com.a6raywa1cher.muchelpspring.security.jwt.JWTAuthenticationFilter;
 import com.a6raywa1cher.muchelpspring.security.jwt.service.JwtTokenService;
 import com.a6raywa1cher.muchelpspring.service.UserService;
 import com.a6raywa1cher.muchelpspring.utils.AuthenticationResolver;
@@ -31,7 +31,6 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
@@ -76,27 +75,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		SimpleUrlAuthenticationFailureHandler handler = new SimpleUrlAuthenticationFailureHandler("/");
-
 		http.sessionManagement()
 				.sessionFixation()
 				.migrateSession();
 
 		http
 				.csrf().disable()
-//				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//				.and()
-//				.exceptionHandling(e -> e
-//						.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-//				)
 				.authorizeRequests()
-//				.antMatchers("/").permitAll()
-//				.antMatchers("/user/reg", "/oauth2/**", "/error").permitAll()
+				.antMatchers("/oauth2/**", "/error", "/login", "/logout").permitAll()
 				.antMatchers("/v2/api-docs", "/webjars/**", "/swagger-resources", "/swagger-resources/**",
-						"/swagger-ui.html").permitAll()
-//				.antMatchers("/csrf").permitAll()
-//				.antMatchers("/poll").permitAll()
-//				.anyRequest().authenticated()
+						"/swagger-ui.html", "/swagger-ui/**").permitAll()
 				.antMatchers("/auth/get_access", "/auth/link_social").permitAll()
 				.antMatchers("/auth/**").authenticated()
 				.antMatchers("/user/current").authenticated()
@@ -117,7 +105,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.oauth2Client();
 		http.cors()
 				.configurationSource(corsConfigurationSource());
-		http.addFilterBefore(new JWTAuthorizationFilter(jwtTokenService, customAuthenticationProvider), OAuth2AuthorizationCodeGrantFilter.class);
+		http.addFilterBefore(new JWTAuthenticationFilter(jwtTokenService, customAuthenticationProvider), OAuth2AuthorizationCodeGrantFilter.class);
 		http.addFilterAfter(new LastVisitFilter(userService, resolver), SecurityContextHolderAwareRequestFilter.class);
 	}
 
@@ -133,7 +121,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			String accessToken = map.get(OAuth2ParameterNames.ACCESS_TOKEN);
 			long expiresIn = Long.parseLong(map.get(OAuth2ParameterNames.EXPIRES_IN));
 
-			OAuth2AccessToken.TokenType accessTokenType = OAuth2AccessToken.TokenType.BEARER;
+			OAuth2AccessToken.TokenType accessTokenType = OAuth2AccessToken.TokenType.BEARER; // vk issue
 
 			Map<String, Object> additionalParameters = new HashMap<>();
 

@@ -3,7 +3,6 @@ package com.a6raywa1cher.muchelpspring.security.jwt.service;
 import com.a6raywa1cher.muchelpspring.model.User;
 import com.a6raywa1cher.muchelpspring.security.model.RefreshToken;
 import com.a6raywa1cher.muchelpspring.security.model.repo.RefreshTokenRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,8 +17,11 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class RefreshTokenServiceImpl implements RefreshTokenService {
-	@Autowired
-	private RefreshTokenRepository repository;
+	private final RefreshTokenRepository repository;
+
+	public RefreshTokenServiceImpl(RefreshTokenRepository repository) {
+		this.repository = repository;
+	}
 
 	@Override
 	public RefreshToken issue(User user) {
