@@ -11,5 +11,9 @@ public interface UserService {
 
 	Optional<User> getByVendorIdOrEmail(VendorId vendorId, String id, String email);
 
+	User setVendorSub(User user, VendorId vendorId, String id);
+
 	User setLastVisit(User user, ZonedDateTime now);
+
+	void delete(User user);
 }

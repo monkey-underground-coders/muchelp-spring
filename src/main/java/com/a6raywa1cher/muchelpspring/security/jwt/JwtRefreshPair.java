@@ -1,4 +1,4 @@
-package com.a6raywa1cher.muchelpspring.security.rest.res;
+package com.a6raywa1cher.muchelpspring.security.jwt;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import java.time.OffsetDateTime;
 
 @Data
 @AllArgsConstructor
-public class GetNewJwtTokenResponse {
+public class JwtRefreshPair {
 	private String refreshToken;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING)

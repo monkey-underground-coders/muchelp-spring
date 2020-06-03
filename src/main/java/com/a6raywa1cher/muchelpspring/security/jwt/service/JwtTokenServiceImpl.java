@@ -7,7 +7,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.time.ZoneId;
@@ -16,7 +16,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Optional;
 
-@Component
+@Service
 public class JwtTokenServiceImpl implements JwtTokenService {
 	private final static String ISSUER_NAME = "muchelp-spring";
 	private final static String VENDOR_ID_CLAIM = "vid";

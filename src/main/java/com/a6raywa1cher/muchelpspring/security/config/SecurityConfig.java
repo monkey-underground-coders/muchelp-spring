@@ -2,6 +2,7 @@ package com.a6raywa1cher.muchelpspring.security.config;
 
 import com.a6raywa1cher.muchelpspring.security.CustomAuthenticationSuccessHandler;
 import com.a6raywa1cher.muchelpspring.security.LastVisitFilter;
+import com.a6raywa1cher.muchelpspring.security.jwt.CustomAuthenticationProvider;
 import com.a6raywa1cher.muchelpspring.security.jwt.JWTAuthorizationFilter;
 import com.a6raywa1cher.muchelpspring.security.jwt.service.JwtTokenService;
 import com.a6raywa1cher.muchelpspring.service.UserService;
@@ -65,6 +66,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private AuthenticationResolver resolver;
 
+	@Autowired
+	private CustomAuthenticationProvider customAuthenticationProvider;
+
 	@Bean
 	public RestTemplate restTemplate() {
 		return new RestTemplate();
@@ -93,7 +97,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //				.antMatchers("/csrf").permitAll()
 //				.antMatchers("/poll").permitAll()
 //				.anyRequest().authenticated()
-				.antMatchers("/auth/get_access").permitAll()
+				.antMatchers("/auth/get_access", "/auth/link_social").permitAll()
 				.antMatchers("/auth/**").authenticated()
 				.antMatchers("/user/current").authenticated()
 				.antMatchers("/subject/**").authenticated()
@@ -113,7 +117,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.oauth2Client();
 		http.cors()
 				.configurationSource(corsConfigurationSource());
-		http.addFilterBefore(new JWTAuthorizationFilter(jwtTokenService), OAuth2AuthorizationCodeGrantFilter.class);
+		http.addFilterBefore(new JWTAuthorizationFilter(jwtTokenService, customAuthenticationProvider), OAuth2AuthorizationCodeGrantFilter.class);
 		http.addFilterAfter(new LastVisitFilter(userService, resolver), SecurityContextHolderAwareRequestFilter.class);
 	}
 
